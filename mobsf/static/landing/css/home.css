@@ -1,0 +1,729 @@
+/*
+ * Globals
+ */
+
+/* Links */
+a,
+a:focus,
+a:hover {
+  color: #fff;
+}
+
+/* Custom default button */
+.btn-secondary,
+.btn-secondary:hover,
+.btn-secondary:focus {
+  color: #333;
+  text-shadow: none; /* Prevent inheritance from `body` */
+  background-color: #fff;
+  border: .05rem solid #fff;
+}
+
+
+/*
+ * Base structure
+ */
+
+html,
+body {
+  height: 100%;
+  background-color: #333;
+}
+
+body {
+  display: -ms-flexbox;
+  display: -webkit-box;
+  display: flex;
+  -ms-flex-pack: center;
+  -webkit-box-pack: center;
+  justify-content: center;
+  color: #fff;
+  text-shadow: 0 .05rem .1rem rgba(0, 0, 0, .5);
+  box-shadow: inset 0 0 5rem rgba(0, 0, 0, .5);
+}
+
+.cover-container {
+  max-width: 42em;
+}
+
+
+/*
+ * Header
+ */
+.masthead {
+  margin-bottom: 2rem;
+}
+
+.masthead-brand {
+  margin-bottom: 0;
+}
+
+.nav-masthead .nav-link {
+  padding: .25rem 0;
+  font-weight: 700;
+  color: rgb(255 255 255 / 71%);
+  background-color: transparent;
+}
+
+.nav-masthead .nav-link:hover,
+.nav-masthead .nav-link:focus {
+  color:  rgba(255, 255, 255, 0.267);
+}
+
+.nav-masthead .nav-link + .nav-link {
+  margin-left: 1rem;
+}
+
+.nav-masthead .active {
+  color: #fff;
+}
+
+@media (min-width: 48em) {
+  .masthead-brand {
+    float: left;
+  }
+  .nav-masthead {
+    float: right;
+  }
+}
+
+
+/*
+ * Cover
+ */
+.cover {
+  padding: 0 1.5rem;
+}
+.cover .btn-lg {
+  padding: .75rem 1.25rem;
+  font-weight: 700;
+}
+
+
+/*
+ * Footer
+ */
+.mastfoot {
+  color: rgba(255, 255, 255, .5);
+}
+
+/* Custom CSS Starts here */
+.fileUpload {
+	position: relative;
+	overflow: hidden;
+	margin: 10px;
+ 
+}
+.fileUpload input {
+	position: absolute;
+	top: 0;
+	right: 0;
+	margin: 0;
+	padding: 0;
+	font-size: 20px;
+	cursor: pointer;
+	opacity: 0;
+	filter: alpha(opacity=0);
+}
+
+/* Custom */ 
+
+/* Full screen drag and drop */
+
+
+div#drop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999999999;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    transition: visibility 175ms, opacity 175ms;
+    display: table;
+    text-shadow: 1px 1px 2px #000;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.45);
+    font: bold 42px Source Sans Pro, Tahoma, sans-serif;
+}
+div#textnode {
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+    transition: font-size 175ms;
+}
+
+/* PROGRESS BAR */
+
+progress {
+  width: 400px;
+
+  margin: 25px auto;
+  display: block;
+  -webkit-appearance: none;
+
+   border: 0;
+    height: 18px;
+    border-radius: 9px;
+}
+
+progress::-webkit-progress-bar {
+  background: black;
+  border-radius: 50px;
+  padding: 2px;
+  box-shadow: 0 1px 0px 0 rgba(255, 255, 255, 0.2);
+}
+
+progress::-webkit-progress-value {
+  border-radius: 50px;
+  box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.4);
+  background:
+    -webkit-linear-gradient(45deg, transparent, transparent 33%, rgba(0, 0, 0, 0.1) 33%, rgba(0, 0, 0, 0.1) 66%, transparent 66%),
+    -webkit-linear-gradient(top, rgba(255, 255, 255, 0.25), rgba(0, 0, 0, 0.2)),
+    -webkit-linear-gradient(left, #ff9b3d, #ff960d);
+
+  background-size: 25px 14px, 100% 100%, 100% 100%;
+  -webkit-animation: move 5s linear 0 infinite;
+}
+
+@keyframes move {
+  0% {background-position: 0px 0px, 0 0, 0 0}
+  100% {background-position: -100px 0px, 0 0, 0 0}
+}
+
+/* The snackbar - position it at the bottom and in the middle of the screen */
+#snackbar {
+  visibility: hidden; /* Hidden by default. Visible on click */
+  width: 100%; /* Make the snackbar full width */
+  background-color: #333; /* Black background color */
+  color: #fff; /* White text color */
+  text-align: center; /* Centered text */
+  border-radius: 0; /* Remove rounded borders for full width */
+  padding: 16px; /* Padding */
+  z-index: 1; /* Add a z-index if needed */
+  left: 0; /* Align to the left edge of the screen */
+  bottom: 30px; /* 30px from the bottom */
+  position: fixed; /* Ensure it stays at the bottom of the viewport */
+}
+
+/* Alert bar class */
+.alert-bar {
+  position: fixed; /* Sticks to the bottom of the screen */
+  bottom: 0; /* Aligns to the bottom */
+  left: 0; /* Aligns to the left edge */
+  width: 100%; /* Spans the full width of the screen */
+  background-color: #00000021; /* Red background (customize as needed) */
+  color: #fff; /* White text color */
+  text-align: center; /* Centered text */
+  padding: 16px; /* Padding inside the bar */
+  font-size: 16px; /* Font size for the text */
+  z-index: 9999; /* Ensure it appears above other content */
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2); /* Adds a subtle shadow */
+  visibility: hidden; /* Hidden by default */
+  opacity: 0; /* Fully transparent */
+  transition: visibility 0s, opacity 0.5s ease-in-out; /* Smooth fade-in/out */
+}
+
+/* Show the alert bar */
+.alert-bar.show {
+  visibility: visible; /* Make it visible */
+  opacity: 1; /* Fully opaque */
+}
+
+/* Optional: Keyframes for additional animation */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.alert-bar.slide-up {
+  animation: slideUp 0.5s ease-in-out;
+}
+/* Alert bar ends */
+
+/* Logo padding ^*/
+
+.pad {
+  padding-right: 50px;
+  padding-left: 50px;
+}
+
+/* =========================================================
+   MOBSF-X UI REDESIGN
+   Custom UI for Cybersecurity Minor Project
+   ========================================================= */
+
+:root {
+    --mfx-bg: #07111f;
+    --mfx-bg2: #0b1728;
+    --mfx-card: rgba(15, 31, 52, 0.92);
+    --mfx-card-hover: rgba(21, 43, 70, 0.98);
+    --mfx-border: rgba(74, 211, 255, 0.16);
+    --mfx-primary: #00d9ff;
+    --mfx-blue: #3874ff;
+    --mfx-green: #28d17c;
+    --mfx-orange: #ff9f43;
+    --mfx-red: #ff3b5c;
+    --mfx-text: #f4f8ff;
+    --mfx-muted: #8fa6bd;
+}
+
+/* ---------- GLOBAL ---------- */
+
+html,
+body {
+    min-height: 100%;
+    background:
+        radial-gradient(circle at 15% 15%, rgba(0, 217, 255, 0.09), transparent 30%),
+        radial-gradient(circle at 85% 80%, rgba(56, 116, 255, 0.10), transparent 32%),
+        linear-gradient(135deg, #050b14 0%, #07111f 50%, #09192b 100%);
+    color: var(--mfx-text);
+}
+
+body {
+    display: block !important;
+    margin: 0;
+    padding: 0 !important;
+    text-shadow: none;
+    box-shadow: none;
+    font-family: "Source Sans Pro", Arial, sans-serif;
+    overflow-x: hidden;
+}
+
+/* subtle security-grid background */
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.16;
+    background-image:
+        linear-gradient(rgba(0, 217, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 217, 255, 0.035) 1px, transparent 1px);
+    background-size: 40px 40px;
+    z-index: 0;
+}
+
+/* ---------- MAIN CONTAINER ---------- */
+
+body > .d-flex {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh !important;
+    padding: 0 !important;
+}
+
+/* ---------- TOP NAV ---------- */
+
+.nav-masthead {
+    position: relative;
+    width: calc(100% - 48px);
+    min-height: 70px;
+    margin: 18px 24px 0 !important;
+    padding: 12px 24px;
+    box-sizing: border-box;
+
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(10, 24, 41, 0.88);
+    border: 1px solid var(--mfx-border);
+    border-radius: 18px;
+
+    box-shadow:
+        0 12px 40px rgba(0, 0, 0, 0.28),
+        inset 0 1px 0 rgba(255,255,255,0.04);
+
+    backdrop-filter: blur(16px);
+}
+
+/* MobSF logo area */
+
+.nav-masthead .pad {
+    order: -1;
+    margin-right: 45px;
+    padding: 0 !important;
+}
+
+.nav-masthead .pad img {
+    display: none;
+}
+
+.nav-masthead .pad::before {
+    content: "🛡";
+    font-size: 27px;
+    vertical-align: middle;
+    margin-right: 9px;
+}
+
+.nav-masthead .pad::after {
+    content: "MobSF-X";
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    vertical-align: middle;
+}
+
+/* navigation links */
+
+.nav-masthead .nav-link {
+    color: #9fb4ca !important;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin: 0 7px !important;
+    padding: 10px 14px !important;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+.nav-masthead .nav-link:hover,
+.nav-masthead .nav-link.active {
+    color: #ffffff !important;
+    background: rgba(0, 217, 255, 0.09);
+}
+
+.nav-masthead .nav-link.active {
+    box-shadow: inset 0 -2px 0 var(--mfx-primary);
+}
+
+/* search */
+
+.nav-masthead form input {
+    width: 170px;
+    height: 38px;
+    border-radius: 10px !important;
+    border: 1px solid rgba(255,255,255,0.10) !important;
+    background: rgba(255,255,255,0.055) !important;
+    color: white !important;
+}
+
+.nav-masthead form input::placeholder {
+    color: #71869d;
+}
+
+/* ---------- MAIN CONTENT ---------- */
+
+main.inner.cover {
+    width: min(1100px, calc(100% - 48px));
+    max-width: none !important;
+    margin: 0 auto;
+    padding: 55px 0 30px;
+}
+
+/* title above upload area */
+
+main.inner.cover::before {
+    content:
+        "Mobile Security Command Center\A"
+        "Analyze Android, iOS and Windows applications with advanced security intelligence.";
+    white-space: pre-line;
+
+    display: block;
+    text-align: left;
+
+    color: var(--mfx-text);
+    font-size: 30px;
+    line-height: 1.35;
+    font-weight: 700;
+
+    padding: 0 5px 30px;
+}
+
+main.inner.cover::after {
+    content:
+        "SECURITY ANALYSIS   •   STATIC ANALYSIS   •   DYNAMIC ANALYSIS   •   THREAT INTELLIGENCE";
+
+    display: block;
+    margin-top: 28px;
+
+    color: #6f879f;
+    font-size: 11px;
+    letter-spacing: 1.6px;
+    text-align: center;
+}
+
+/* ---------- UPLOAD CARD ---------- */
+
+#upload_form {
+    position: relative;
+    width: 100%;
+    min-height: 300px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    padding: 45px 30px;
+    box-sizing: border-box;
+
+    background:
+        radial-gradient(circle at 50% 0%, rgba(0,217,255,0.09), transparent 45%),
+        var(--mfx-card);
+
+    border: 1px solid var(--mfx-border);
+    border-radius: 24px;
+
+    box-shadow:
+        0 25px 70px rgba(0,0,0,0.35),
+        inset 0 1px 0 rgba(255,255,255,0.04);
+
+    overflow: hidden;
+}
+
+#upload_form::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 12%;
+    width: 76%;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(0,217,255,0.7),
+        transparent
+    );
+}
+
+/* upload button */
+
+#but {
+    position: relative;
+    margin: 0 !important;
+    padding: 0 !important;
+
+    width: min(430px, 90%);
+    height: 125px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px dashed rgba(0,217,255,0.45) !important;
+    border-radius: 18px !important;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(0,217,255,0.08),
+            rgba(56,116,255,0.08)
+        ) !important;
+
+    color: white !important;
+
+    box-shadow: none !important;
+
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+#but:hover {
+    transform: translateY(-3px);
+    border-color: var(--mfx-primary) !important;
+    background:
+        linear-gradient(
+            135deg,
+            rgba(0,217,255,0.15),
+            rgba(56,116,255,0.13)
+        ) !important;
+}
+
+#but span {
+    font-size: 22px;
+    margin-right: 12px;
+    color: var(--mfx-primary);
+}
+
+/* Replace button text visually */
+
+#but::after {
+    content: "Upload Application  •  APK / IPA / APPX";
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+}
+
+/* Hide original text */
+
+#but {
+    font-size: 0;
+}
+
+#but span {
+    font-size: 22px;
+}
+
+/* drag and drop hint */
+
+#upload_form small {
+    margin-top: 18px;
+    color: var(--mfx-muted);
+    font-size: 13px;
+}
+
+#upload_form small i {
+    font-style: normal;
+}
+
+#upload_form small i::before {
+    content: "↕ ";
+    color: var(--mfx-primary);
+}
+
+/* ---------- STATUS ---------- */
+
+#status {
+    color: var(--mfx-primary);
+    font-size: 14px;
+}
+
+/* ---------- PROGRESS ---------- */
+
+#progressBar {
+    width: 430px !important;
+    max-width: 80%;
+}
+
+progress::-webkit-progress-bar {
+    background: #07111f;
+}
+
+progress::-webkit-progress-value {
+    background: linear-gradient(
+        90deg,
+        var(--mfx-primary),
+        var(--mfx-blue)
+    );
+}
+
+/* ---------- DOWNLOAD SCAN ---------- */
+
+#package {
+    width: min(650px, 90%);
+    height: 45px;
+
+    margin-top: 28px;
+
+    background: rgba(255,255,255,0.045);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 11px;
+
+    color: white;
+}
+
+#package::placeholder {
+    color: #71869d;
+}
+
+/* ---------- FOOTER ---------- */
+
+.mastfoot {
+    width: 100%;
+    margin-top: 20px !important;
+    padding: 20px 0 25px;
+
+    background: rgba(4, 10, 18, 0.45);
+    border-top: 1px solid rgba(255,255,255,0.05);
+
+    color: #6f879f !important;
+}
+
+.mastfoot h6 {
+    font-size: 11px;
+    letter-spacing: 0.7px;
+}
+
+.mastfoot a {
+    color: #8ca4bc !important;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.mastfoot a:hover {
+    color: var(--mfx-primary) !important;
+}
+
+.mastfoot p {
+    color: #526a82;
+    font-size: 12px;
+}
+
+/* ---------- DROP OVERLAY ---------- */
+
+div#drop {
+    background:
+        radial-gradient(
+            circle,
+            rgba(0,217,255,0.12),
+            rgba(3,10,20,0.96)
+        ) !important;
+    backdrop-filter: blur(10px);
+}
+
+div#textnode {
+    color: var(--mfx-primary);
+    font-size: 40px;
+}
+
+/* ---------- ALERT ---------- */
+
+.alert-bar {
+    background: linear-gradient(
+        90deg,
+        #071b2a,
+        #0d2b40
+    ) !important;
+
+    border-top: 1px solid rgba(0,217,255,0.25);
+    color: white !important;
+}
+
+/* ---------- RESPONSIVE ---------- */
+
+@media (max-width: 768px) {
+
+    .nav-masthead {
+        width: calc(100% - 20px);
+        margin: 10px !important;
+        padding: 10px;
+        flex-wrap: wrap;
+    }
+
+    .nav-masthead .pad {
+        margin-right: 10px;
+    }
+
+    .nav-masthead .nav-link {
+        font-size: 11px;
+        padding: 7px !important;
+    }
+
+    main.inner.cover {
+        width: calc(100% - 20px);
+        padding-top: 30px;
+    }
+
+    main.inner.cover::before {
+        font-size: 23px;
+    }
+
+    #upload_form {
+        min-height: 260px;
+        padding: 25px 15px;
+    }
+
+    #but {
+        width: 95%;
+    }
+}
