@@ -1,1196 +1,1345 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <title>MobSF - Security Analysis</title>
-
-    <link rel="icon" href="{% static 'img/favicon.ico' %}">
-
-    <link rel="stylesheet"
-          href="{% static 'adminlte/plugins/fontawesome-free/css/all.min.css' %}">
-
-    <link rel="stylesheet"
-          href="{% static 'adminlte/plugins/bootstrap/bootstrap.bundle.min.css' %}">
-
-    <link rel="stylesheet"
-          href="{% static 'others/css/spinner.css' %}">
-
-    <style>
-
-        /* =====================================================
-           GLOBAL
-        ===================================================== */
-
-        * {
-            box-sizing: border-box;
-        }
-
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            min-height: 100%;
-        }
-
-        body {
-            overflow-x: hidden;
-            color: #e9faff;
-            font-family: "Segoe UI", Arial, sans-serif;
-
-            background:
-                radial-gradient(
-                    circle at 50% 30%,
-                    rgba(0, 220, 255, 0.12),
-                    transparent 30%
-                ),
-                radial-gradient(
-                    circle at 20% 80%,
-                    rgba(75, 0, 255, 0.12),
-                    transparent 35%
-                ),
-                #030711;
-        }
-
-
-        /* =====================================================
-           ANIMATED BACKGROUND
-        ===================================================== */
-
-        .background {
-            position: fixed;
-            inset: 0;
-            z-index: -10;
-            overflow: hidden;
-            pointer-events: none;
-        }
-
-        .grid {
-            position: absolute;
-            width: 200%;
-            height: 200%;
-            left: -50%;
-            top: 30%;
-
-            background-image:
-                linear-gradient(
-                    rgba(0, 220, 255, 0.08) 1px,
-                    transparent 1px
-                ),
-                linear-gradient(
-                    90deg,
-                    rgba(0, 220, 255, 0.08) 1px,
-                    transparent 1px
-                );
-
-            background-size: 60px 60px;
-
-            transform:
-                perspective(500px)
-                rotateX(60deg);
-
-            animation:
-                gridMove 10s linear infinite;
-        }
-
-        @keyframes gridMove {
-
-            from {
-                transform:
-                    perspective(500px)
-                    rotateX(60deg)
-                    translateY(0);
-            }
-
-            to {
-                transform:
-                    perspective(500px)
-                    rotateX(60deg)
-                    translateY(60px);
-            }
-        }
-
-
-        .glow {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(60px);
-            opacity: 0.25;
-        }
-
-        .glow.one {
-            width: 300px;
-            height: 300px;
-            background: #00d9ff;
-            top: 10%;
-            left: 10%;
-            animation: floatOne 7s ease-in-out infinite;
-        }
-
-        .glow.two {
-            width: 400px;
-            height: 400px;
-            background: #5b21ff;
-            right: 5%;
-            bottom: 10%;
-            animation: floatTwo 9s ease-in-out infinite;
-        }
-
-        @keyframes floatOne {
-
-            0%,100% {
-                transform: translate(0,0);
-            }
-
-            50% {
-                transform: translate(80px,50px);
-            }
-        }
-
-        @keyframes floatTwo {
-
-            0%,100% {
-                transform: translate(0,0);
-            }
-
-            50% {
-                transform: translate(-80px,-40px);
-            }
-        }
-
-
-        /* =====================================================
-           PARTICLES
-        ===================================================== */
-
-        .particles {
-            position: absolute;
-            inset: 0;
-        }
-
-        .particle {
-            position: absolute;
-            width: 3px;
-            height: 3px;
-            border-radius: 50%;
-            background: #00eaff;
-            box-shadow: 0 0 12px #00eaff;
-            animation: particleFloat 6s linear infinite;
-            opacity: 0.7;
-        }
-
-        .p1 { left: 10%; top: 20%; animation-delay: 0s; }
-        .p2 { left: 20%; top: 70%; animation-delay: 1s; }
-        .p3 { left: 35%; top: 30%; animation-delay: 2s; }
-        .p4 { left: 50%; top: 80%; animation-delay: 3s; }
-        .p5 { left: 65%; top: 25%; animation-delay: 1.5s; }
-        .p6 { left: 80%; top: 65%; animation-delay: 2.5s; }
-        .p7 { left: 90%; top: 20%; animation-delay: 4s; }
-        .p8 { left: 45%; top: 45%; animation-delay: 3.5s; }
-
-        @keyframes particleFloat {
-
-            0% {
-                transform: translateY(0) scale(1);
-                opacity: 0;
-            }
-
-            20% {
-                opacity: 0.8;
-            }
-
-            80% {
-                opacity: 0.8;
-            }
-
-            100% {
-                transform: translateY(-180px) scale(0);
-                opacity: 0;
-            }
-        }
-
-
-        /* =====================================================
-           MAIN PAGE
-        ===================================================== */
-
-        .page {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-
-        /* =====================================================
-           NAVIGATION
-        ===================================================== */
-
-        .topbar {
-            width: 100%;
-            padding: 22px 35px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 30px;
-
-            background: rgba(2, 8, 20, 0.72);
-
-            border-bottom:
-                1px solid rgba(0, 220, 255, 0.18);
-
-            backdrop-filter: blur(15px);
-
-            box-shadow:
-                0 10px 40px rgba(0,0,0,0.35);
-        }
-
-        .nav-link {
-            color: #9bbbc7 !important;
-            text-decoration: none;
-            font-size: 12px;
-            letter-spacing: 1.5px;
-            font-weight: 600;
-
-            transition:
-                color 0.3s,
-                transform 0.3s,
-                text-shadow 0.3s;
-        }
-
-        .nav-link:hover,
-        .nav-link.active {
-            color: #00eaff !important;
-            transform: translateY(-2px);
-
-            text-shadow:
-                0 0 12px rgba(0,234,255,0.8);
-        }
-
-        .logo {
-            width: 90px;
-            height: 30px;
-            object-fit: contain;
-
-            filter:
-                drop-shadow(0 0 10px rgba(0,220,255,0.7));
-        }
-
-
-        /* =====================================================
-           HERO
-        ===================================================== */
-
-        .hero {
-            flex: 1;
-
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-
-            padding: 70px 20px 50px;
-
-            text-align: center;
-        }
-
-
-        .security-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-
-            padding: 8px 18px;
-
-            border-radius: 30px;
-
-            background:
-                rgba(0, 220, 255, 0.07);
-
-            border:
-                1px solid rgba(0, 220, 255, 0.3);
-
-            color: #6eefff;
-
-            font-size: 11px;
-            letter-spacing: 2px;
-
-            box-shadow:
-                0 0 25px rgba(0,220,255,0.08);
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-
-            background: #00ff9d;
-
-            box-shadow:
-                0 0 10px #00ff9d;
-
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-
-            0%,100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-
-            50% {
-                opacity: 0.4;
-                transform: scale(1.5);
-            }
-        }
-
-
-        .title {
-            margin-top: 25px;
-            margin-bottom: 8px;
-
-            font-size: clamp(32px, 5vw, 60px);
-
-            font-weight: 800;
-
-            letter-spacing: 5px;
-
-            color: #ffffff;
-
-            text-shadow:
-                0 0 20px rgba(0,220,255,0.3);
-        }
-
-        .title span {
-            color: #00eaff;
-
-            text-shadow:
-                0 0 25px rgba(0,234,255,0.7);
-        }
-
-        .subtitle {
-            color: #7997a5;
-            font-size: 14px;
-            letter-spacing: 2px;
-            margin-bottom: 50px;
-        }
-
-
-        /* =====================================================
-           3D UPLOAD PLATFORM
-        ===================================================== */
-
-        .scene {
-            width: min(620px, 90vw);
-            height: 350px;
-
-            perspective: 1200px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .upload-platform {
-            position: relative;
-
-            width: 100%;
-            max-width: 570px;
-            height: 290px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            transform-style: preserve-3d;
-
-            transform:
-                rotateX(12deg)
-                rotateY(-5deg);
-
-            transition:
-                transform 0.5s ease;
-
-            animation:
-                platformFloat 4s ease-in-out infinite;
-
-            background:
-                linear-gradient(
-                    145deg,
-                    rgba(10,35,55,0.95),
-                    rgba(3,13,28,0.97)
-                );
-
-            border:
-                1px solid rgba(0,234,255,0.35);
-
-            border-radius: 24px;
-
-            box-shadow:
-                0 30px 80px rgba(0,0,0,0.7),
-                inset 0 0 35px rgba(0,220,255,0.06),
-                0 0 35px rgba(0,220,255,0.08);
-        }
-
-        @keyframes platformFloat {
-
-            0%,100% {
-                transform:
-                    rotateX(12deg)
-                    rotateY(-5deg)
-                    translateY(0);
-            }
-
-            50% {
-                transform:
-                    rotateX(12deg)
-                    rotateY(-5deg)
-                    translateY(-12px);
-            }
-        }
-
-
-        .platform-line {
-            position: absolute;
-            left: 8%;
-            right: 8%;
-            height: 1px;
-
-            background:
-                linear-gradient(
-                    90deg,
-                    transparent,
-                    #00eaff,
-                    transparent
-                );
-
-            opacity: 0.4;
-        }
-
-        .line-top {
-            top: 20px;
-        }
-
-        .line-bottom {
-            bottom: 20px;
-        }
-
-
-        /* =====================================================
-           3D SHIELD
-        ===================================================== */
-
-        .shield {
-            position: absolute;
-
-            top: -48px;
-
-            width: 100px;
-            height: 115px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            color: #00eaff;
-
-            font-size: 48px;
-
-            background:
-                linear-gradient(
-                    145deg,
-                    rgba(0,234,255,0.16),
-                    rgba(0,70,110,0.08)
-                );
-
-            clip-path:
-                polygon(
-                    50% 0%,
-                    92% 18%,
-                    84% 72%,
-                    50% 100%,
-                    16% 72%,
-                    8% 18%
-                );
-
-            border: 1px solid rgba(0,234,255,0.4);
-
-            filter:
-                drop-shadow(0 0 15px rgba(0,234,255,0.7));
-
-            transform: translateZ(50px);
-
-            animation:
-                shieldGlow 2.5s ease-in-out infinite;
-        }
-
-        @keyframes shieldGlow {
-
-            0%,100% {
-                filter:
-                    drop-shadow(
-                        0 0 10px
-                        rgba(0,234,255,0.5)
-                    );
-            }
-
-            50% {
-                filter:
-                    drop-shadow(
-                        0 0 30px
-                        rgba(0,234,255,1)
-                    );
-            }
-        }
-
-
-        /* =====================================================
-           UPLOAD CONTENT
-        ===================================================== */
-
-        .upload-content {
-            position: relative;
-            z-index: 5;
-
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-
-            transform: translateZ(35px);
-        }
-
-        .upload-icon {
-            font-size: 38px;
-            color: #00eaff;
-
-            margin-bottom: 15px;
-
-            text-shadow:
-                0 0 20px rgba(0,234,255,0.9);
-        }
-
-        .upload-title {
-            color: white;
-
-            font-size: 20px;
-            font-weight: 700;
-
-            letter-spacing: 1px;
-
-            margin-bottom: 8px;
-        }
-
-        .upload-types {
-            color: #7fa5b5;
-
-            font-size: 12px;
-
-            letter-spacing: 1.5px;
-
-            margin-bottom: 20px;
-        }
-
-
-        /* =====================================================
-           UPLOAD BUTTON
-        ===================================================== */
-
-        .fileUpload {
-            position: relative;
-
-            overflow: hidden;
-
-            display: inline-flex;
-
-            align-items: center;
-            justify-content: center;
-
-            gap: 10px;
-
-            padding: 14px 30px;
-
-            min-width: 240px;
-
-            border-radius: 12px;
-
-            color: #001319 !important;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #00f0ff,
-                    #00a8ff
-                );
-
-            border: none;
-
-            font-size: 13px;
-
-            font-weight: 800;
-
-            letter-spacing: 1px;
-
-            cursor: pointer;
-
-            box-shadow:
-                0 0 20px
-                rgba(0,220,255,0.35),
-
-                0 12px 30px
-                rgba(0,0,0,0.45);
-
-            transition:
-                transform 0.25s,
-                box-shadow 0.25s;
-        }
-
-        .fileUpload:hover {
-
-            transform:
-                translateY(-4px)
-                scale(1.03);
-
-            box-shadow:
-                0 0 35px
-                rgba(0,220,255,0.7),
-
-                0 18px 35px
-                rgba(0,0,0,0.5);
-        }
-
-        .fileUpload:active {
-
-            transform:
-                translateY(1px)
-                scale(0.98);
-        }
-
-        .fileUpload input[type=file] {
-
-            position: absolute;
-
-            left: 0;
-            top: 0;
-
-            width: 100%;
-            height: 100%;
-
-            opacity: 0;
-
-            cursor: pointer;
-        }
-
-
-        /* =====================================================
-           SCAN RINGS
-        ===================================================== */
-
-        .scan-ring {
-
-            position: absolute;
-
-            width: 360px;
-            height: 360px;
-
-            border-radius: 50%;
-
-            border:
-                1px solid
-                rgba(0,234,255,0.08);
-
-            pointer-events: none;
-        }
-
-        .ring1 {
-            animation:
-                ringPulse 4s infinite;
-        }
-
-        .ring2 {
-            width: 430px;
-            height: 430px;
-
-            animation:
-                ringPulse 4s 1s infinite;
-        }
-
-        @keyframes ringPulse {
-
-            0% {
-                transform: scale(0.8);
-                opacity: 0;
-            }
-
-            30% {
-                opacity: 1;
-            }
-
-            100% {
-                transform: scale(1.2);
-                opacity: 0;
-            }
-        }
-
-
-        /* =====================================================
-           STATUS
-        ===================================================== */
-
-        #status {
-
-            min-height: 25px;
-
-            margin-top: 25px;
-
-            color: #00eaff;
-
-            font-size: 13px;
-
-            letter-spacing: 1px;
-
-            text-shadow:
-                0 0 10px
-                rgba(0,234,255,0.7);
-        }
-
-        #progressBar {
-
-            margin-top: 10px;
-
-            accent-color: #00eaff;
-        }
-
-
-        /* =====================================================
-           FOOTER
-        ===================================================== */
-
-        footer {
-
-            padding: 20px;
-
-            background:
-                rgba(2,8,20,0.7);
-
-            border-top:
-                1px solid
-                rgba(0,220,255,0.12);
-        }
-
-        footer a {
-
-            color: #7897a5;
-
-            text-decoration: none;
-
-            font-size: 10px;
-
-            letter-spacing: 1px;
-
-            transition: color 0.2s;
-        }
-
-        footer a:hover {
-
-            color: #00eaff;
-        }
-
-        .copyright {
-
-            color: #46606c;
-
-            font-size: 10px;
-
-            margin-top: 10px;
-        }
-
-
-        /* =====================================================
-           RESPONSIVE
-        ===================================================== */
-
-        @media (max-width: 700px) {
-
-            .topbar {
-
-                gap: 12px;
-
-                padding:
-                    18px 10px;
-            }
-
-            .nav-link {
-
-                font-size: 9px;
-
-                letter-spacing: 0.7px;
-            }
-
-            .logo {
-
-                width: 65px;
-            }
-
-            .hero {
-
-                padding-top: 50px;
-            }
-
-            .scene {
-
-                height: 320px;
-            }
-
-            .upload-platform {
-
-                height: 270px;
-            }
-
-            .title {
-
-                letter-spacing: 2px;
-            }
-
-            .scan-ring {
-
-                width: 280px;
-                height: 280px;
-            }
-
-            .ring2 {
-
-                width: 330px;
-                height: 330px;
-            }
-        }
-
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Application Security Analysis</title>
+<link rel="icon" href="{% static 'img/favicon.ico' %}">
+<link rel="stylesheet" href="{% static 'adminlte/plugins/fontawesome-free/css/all.min.css' %}">
+<link rel="stylesheet" href="{% static 'adminlte/plugins/bootstrap/bootstrap.bundle.min.css' %}">
+<link rel="stylesheet" href="{% static 'others/css/spinner.css' %}">
+<style>
+*{box-sizing:border-box}
+:root{--cyan:#00eaff;--blue:#168cff;--purple:#8b5cff;--green:#00f6a6;--bg:#020612;--line:rgba(54,155,255,.34);--muted:#7f96ad}
+html,body{margin:0;min-height:100%;background:#020611;color:#eaf7ff;font-family:"Segoe UI",Arial,sans-serif}
+body{overflow-x:hidden} button,a{font:inherit}a{text-decoration:none}
+.background{position:fixed;inset:0;z-index:-20;overflow:hidden;background:radial-gradient(circle at 52% 40%,rgba(0,183,255,.15),transparent 28%),radial-gradient(circle at 88% 20%,rgba(128,56,255,.16),transparent 25%),radial-gradient(circle at 15% 85%,rgba(0,100,255,.14),transparent 30%),#020611}
+.space{position:absolute;inset:0;background-image:radial-gradient(#9defff 1px,transparent 1px);background-size:90px 90px;opacity:.16;animation:stars 16s linear infinite}
+.grid3d{position:absolute;left:-25%;bottom:-35%;width:150%;height:95%;transform:perspective(650px) rotateX(64deg);background-image:linear-gradient(rgba(0,214,255,.15) 1px,transparent 1px),linear-gradient(90deg,rgba(0,214,255,.12) 1px,transparent 1px);background-size:60px 60px;mask-image:linear-gradient(to top,black,transparent);animation:gridmove 5s linear infinite}
+.orb{position:absolute;border-radius:50%;transform-style:preserve-3d;opacity:.65}
+.orb.a{width:260px;height:260px;left:4%;top:18%;background:radial-gradient(circle at 35% 35%,#00eaff,transparent 55%);filter:blur(35px);animation:orbA 9s ease-in-out infinite}
+.orb.b{width:340px;height:340px;right:2%;top:30%;background:radial-gradient(circle at 50% 50%,#7b43ff,transparent 58%);filter:blur(45px);animation:orbB 11s ease-in-out infinite}
+.orb.c{width:180px;height:180px;left:45%;bottom:2%;background:radial-gradient(circle,#00f6a6,transparent 65%);filter:blur(32px);animation:orbC 7s ease-in-out infinite}
+.scanline{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#00eaff,transparent);box-shadow:0 0 20px #00eaff;opacity:.35;animation:scanline 6s linear infinite}
+@keyframes gridmove{to{background-position:0 60px,0 60px}} @keyframes stars{to{background-position:0 90px}}
+@keyframes orbA{50%{transform:translate3d(100px,50px,80px) scale(1.18)}} @keyframes orbB{50%{transform:translate3d(-80px,-70px,60px) scale(.9)}} @keyframes orbC{50%{transform:translate3d(0,-80px,80px) scale(1.3)}} @keyframes scanline{from{top:-4px}to{top:100%}}
+.shell{min-height:100vh;display:flex}
+.sidebar{width:238px;position:fixed;inset:0 auto 0 0;z-index:20;padding:18px 12px;background:linear-gradient(180deg,rgba(3,10,25,.94),rgba(2,7,18,.88));border-right:1px solid rgba(55,153,255,.28);box-shadow:15px 0 55px rgba(0,0,0,.4);backdrop-filter:blur(18px)}
+.brand{height:88px;display:flex;align-items:center;gap:11px;padding:10px 12px;margin-bottom:12px}.brand img{width:58px;height:58px;object-fit:contain;filter:drop-shadow(0 0 13px rgba(0,221,255,.75))}.brand strong{font-size:22px;letter-spacing:1px;color:#fff}.brand small{display:block;font-size:9px;color:#75a2ba;letter-spacing:1.6px;margin-top:2px}
+.nav{display:flex;flex-direction:column;gap:6px}.nav button,.nav a{width:100%;border:1px solid transparent;background:transparent;color:#b9cad8;border-radius:12px;padding:13px 14px;display:flex;align-items:center;gap:14px;text-align:left;cursor:pointer;transition:.25s}.nav button i,.nav a i{width:20px;text-align:center;color:#77a6c8}.nav button:hover,.nav a:hover,.nav .active{color:#fff;background:linear-gradient(90deg,rgba(0,180,255,.22),rgba(112,69,255,.12));border-color:rgba(0,214,255,.35);box-shadow:inset 0 0 20px rgba(0,170,255,.08),0 0 18px rgba(0,170,255,.08);transform:translateX(3px)}.nav .active i{color:#00eaff;text-shadow:0 0 12px #00eaff}
+.engine-card{position:absolute;left:12px;right:12px;bottom:15px;padding:17px;border:1px solid rgba(0,234,255,.28);border-radius:16px;background:linear-gradient(145deg,rgba(0,214,255,.09),rgba(30,30,80,.12));box-shadow:inset 0 0 30px rgba(0,234,255,.04)}.engine-title{font-size:11px;letter-spacing:1.3px;color:#d9edf7}.online{color:#00f6a6;font-weight:800;font-size:11px;margin-top:8px}.online:before{content:"";display:inline-block;width:7px;height:7px;background:#00f6a6;border-radius:50%;box-shadow:0 0 12px #00f6a6;margin-right:7px;animation:pulse 1.4s infinite}
+@keyframes pulse{50%{opacity:.35;transform:scale(1.5)}}
+.main{margin-left:238px;width:calc(100% - 238px);padding:18px 22px 28px}
+.top{height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border:1px solid rgba(56,147,255,.25);border-radius:18px;background:rgba(4,11,27,.72);backdrop-filter:blur(18px);box-shadow:0 15px 50px rgba(0,0,0,.28)}.status-pill{padding:8px 16px;border:1px solid rgba(0,234,255,.35);border-radius:999px;color:#8defff;font-size:11px;letter-spacing:1.5px;background:rgba(0,234,255,.06)}.status-pill b{color:#00f6a6;margin-right:8px}.user{display:flex;align-items:center;gap:12px}.avatar{width:38px;height:38px;border-radius:50%;border:1px solid rgba(0,234,255,.5);display:grid;place-items:center;background:linear-gradient(135deg,#172b58,#070c1d);color:#00eaff;font-size:16px;box-shadow:0 0 16px rgba(0,234,255,.2)}.user strong{display:block;font-size:12px}.user small{color:#70899c;font-size:10px}
+.hero{display:grid;grid-template-columns:minmax(250px,1fr) minmax(360px,1.5fr) minmax(260px,1fr);gap:18px;align-items:center;padding:28px 5px 18px}
+.intro h1{font-size:clamp(42px,5vw,72px);line-height:.88;margin:0;font-weight:900;letter-spacing:2px;color:white;text-shadow:0 0 28px rgba(0,180,255,.22)}.intro h1 span{display:block;color:#00bfff;text-shadow:0 0 24px rgba(0,191,255,.7)}.intro h1 em{font-style:normal;color:#8d58ff;text-shadow:0 0 24px rgba(141,88,255,.65)}.intro p{color:#8da5b7;letter-spacing:1.2px;font-size:13px;line-height:1.6;max-width:440px}.assistant{margin-top:20px;padding:14px 16px;border:1px solid rgba(125,79,255,.35);border-radius:15px;background:linear-gradient(145deg,rgba(23,28,70,.7),rgba(5,13,30,.7));box-shadow:0 0 35px rgba(93,54,255,.08)}.assistant b{color:#fff;font-size:12px}.assistant small{display:block;color:#7895a9;margin-top:5px}
+.scanner{position:relative;min-height:430px;display:grid;place-items:center;perspective:1100px}.core{width:310px;height:310px;position:relative;transform-style:preserve-3d;animation:corefloat 5s ease-in-out infinite}.core-ring{position:absolute;inset:35px;border-radius:50%;border:2px solid rgba(0,234,255,.6);box-shadow:0 0 20px #00eaff,inset 0 0 30px rgba(0,234,255,.18);animation:spin 7s linear infinite}.core-ring.r2{inset:65px;border-color:rgba(139,92,255,.6);animation-duration:11s;animation-direction:reverse}.core-ring.r3{inset:93px;border-style:dashed;border-color:rgba(0,246,166,.55);animation-duration:16s}.core-shield{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) translateZ(55px);width:112px;height:128px;clip-path:polygon(50% 0,92% 17%,84% 74%,50% 100%,16% 74%,8% 17%);background:linear-gradient(145deg,rgba(0,234,255,.32),rgba(58,37,130,.3));display:grid;place-items:center;color:#fff;font-size:45px;filter:drop-shadow(0 0 25px #00eaff);animation:shield 2.6s ease-in-out infinite}.core-orbit{position:absolute;inset:-4px;border:1px solid rgba(0,234,255,.2);border-radius:50%;transform:rotateX(67deg);animation:spin 8s linear infinite}.core-orbit:after{content:"";position:absolute;left:50%;top:-5px;width:9px;height:9px;background:#00eaff;border-radius:50%;box-shadow:0 0 18px #00eaff}.core-label{position:absolute;bottom:0;left:50%;transform:translateX(-50%);text-align:center;white-space:nowrap}.core-label b{font-size:12px;letter-spacing:2px}.core-label small{display:block;color:#00f6a6;font-size:9px;letter-spacing:1.5px;margin-top:4px}
+@keyframes corefloat{50%{transform:translateY(-12px) rotateX(4deg) rotateY(-5deg)}} @keyframes spin{to{transform:rotate(360deg)}} @keyframes shield{50%{filter:drop-shadow(0 0 42px #00eaff);transform:translate(-50%,-50%) translateZ(80px) scale(1.04)}}
+.card{border:1px solid var(--line);background:linear-gradient(145deg,rgba(5,16,34,.88),rgba(4,9,23,.76));border-radius:18px;box-shadow:0 18px 55px rgba(0,0,0,.35),inset 0 0 30px rgba(0,180,255,.035);backdrop-filter:blur(14px)}.upload-card{padding:20px;position:relative;overflow:hidden}.card-title{font-size:12px;letter-spacing:1.2px;font-weight:800;color:#dceefa}.upload-icon{width:86px;height:86px;border-radius:50%;margin:20px auto 14px;display:grid;place-items:center;border:1px solid rgba(0,234,255,.45);color:#00eaff;font-size:32px;background:radial-gradient(circle,rgba(0,234,255,.18),rgba(0,234,255,.02));box-shadow:0 0 35px rgba(0,234,255,.14);animation:iconpulse 2.5s infinite}@keyframes iconpulse{50%{transform:scale(1.06);box-shadow:0 0 55px rgba(0,234,255,.3)}}.upload-card p{text-align:center;color:#7993a6;font-size:10px;letter-spacing:1px}.fileUpload{position:relative;overflow:hidden;display:flex;justify-content:center;align-items:center;gap:9px;padding:12px;border-radius:11px;color:#00151d;font-weight:900;font-size:12px;letter-spacing:1px;background:linear-gradient(135deg,#00f0ff,#218cff);cursor:pointer;box-shadow:0 0 25px rgba(0,210,255,.35);transition:.25s}.fileUpload:hover{transform:translateY(-3px);box-shadow:0 0 38px rgba(0,210,255,.65)}.fileUpload input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}.status{min-height:20px;text-align:center;color:#00eaff;font-size:10px;margin-top:10px}#progressBar{accent-color:#00eaff}
+.score-card{padding:18px}.score-head{display:flex;justify-content:space-between;align-items:center}.score-ring{width:145px;height:145px;border-radius:50%;margin:18px auto;display:grid;place-items:center;background:conic-gradient(#00f6a6 0 82%,#1a2a43 82% 100%);position:relative;box-shadow:0 0 35px rgba(0,246,166,.16)}.score-ring:before{content:"";position:absolute;inset:11px;border-radius:50%;background:#06101e;border:1px solid rgba(0,234,255,.15)}.score-ring span{position:relative;font-size:27px;font-weight:900}.score-ring small{position:absolute;top:83px;color:#00f6a6;font-size:9px;letter-spacing:1px}.checks{display:grid;gap:8px}.check{font-size:10px;color:#a6bbc8;display:flex;gap:8px;align-items:center}.check i{color:#00f6a6}
+.overview{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:10px}.metric{padding:18px;position:relative;overflow:hidden}.metric i{color:#00bfff;font-size:18px}.metric strong{display:block;font-size:25px;margin-top:8px}.metric span{color:#7892a5;font-size:9px;letter-spacing:1px}.metric .live{color:#00f6a6;font-size:10px}
+.recent{margin-top:16px;padding:18px}.recent-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.action{border:1px solid rgba(0,220,255,.25);background:rgba(0,180,255,.06);color:#7edfff;padding:8px 12px;border-radius:9px;cursor:pointer;font-size:10px}.activity{display:grid;grid-template-columns:1fr auto auto;gap:12px;padding:11px 0;border-bottom:1px solid rgba(100,160,200,.09);font-size:11px}.activity:last-child{border-bottom:0}.safe{color:#00f6a6}
+.quick{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:16px}.quick button{min-height:78px;border:1px solid rgba(55,157,255,.28);background:linear-gradient(145deg,rgba(7,23,47,.9),rgba(4,10,24,.8));color:#bfe8f6;border-radius:15px;cursor:pointer;transition:.25s;box-shadow:inset 0 0 20px rgba(0,180,255,.03)}.quick button:hover{transform:translateY(-5px);border-color:#00eaff;box-shadow:0 0 28px rgba(0,234,255,.15)}.quick i{display:block;font-size:22px;color:#00eaff;margin-bottom:7px}.quick b{font-size:10px;letter-spacing:1px}.quick small{display:block;color:#617e91;font-size:8px;margin-top:3px}
+.drop-overlay{position:fixed;inset:0;z-index:100;display:none;place-items:center;background:rgba(0,5,18,.72);backdrop-filter:blur(8px);border:4px solid #00eaff}.drop-overlay.show{display:grid}.drop-box{padding:55px 90px;border:1px solid #00eaff;border-radius:28px;background:rgba(4,17,36,.92);box-shadow:0 0 80px rgba(0,234,255,.3);text-align:center}.drop-box i{font-size:60px;color:#00eaff}.drop-box h2{margin:15px 0 5px}.drop-box p{color:#7692a4}
+#moduleToast{position:fixed;right:28px;bottom:28px;z-index:150;display:flex;align-items:center;gap:12px;padding:14px 18px;border:1px solid rgba(0,234,255,.35);border-radius:13px;background:rgba(3,12,28,.94);box-shadow:0 0 35px rgba(0,180,255,.18);transform:translateY(25px);opacity:0;pointer-events:none;transition:.3s}#moduleToast.show{transform:translateY(0);opacity:1}#moduleToast i{color:#00eaff}#moduleToast small{display:block;color:#7893a6;font-size:9px;margin-top:3px}
+.hidden{display:none!important}.loading{position:fixed!important;inset:0;z-index:200;background:rgba(0,0,0,.75);display:grid;place-items:center}
+@media(max-width:1100px){.hero{grid-template-columns:1fr 1fr}.intro{grid-column:1/-1;text-align:center}.intro p{margin-left:auto;margin-right:auto}.overview{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:760px){.sidebar{width:72px;padding:10px 7px}.brand{justify-content:center;padding:0}.brand img{width:48px}.brand div,.nav button span,.nav a span,.engine-card{display:none}.nav button,.nav a{justify-content:center;padding:14px 4px}.main{margin-left:72px;width:calc(100% - 72px);padding:10px}.top{padding:0 10px}.user div{display:none}.hero{grid-template-columns:1fr}.intro{text-align:left}.intro p{margin-left:0}.quick{grid-template-columns:repeat(2,1fr)}.quick button:last-child{grid-column:1/-1}.overview{grid-template-columns:1fr 1fr}}
+
+/* =========================================================
+   PREMIUM 3D APPLICATION SECURITY ROBOT
+   ONLY ROBOT UI
+========================================================= */
+
+.robot-stage{
+    height:480px;
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    perspective:1400px;
+    overflow:visible;
+    isolation:isolate;
+}
+
+/* ---------- ROBOT AMBIENT LIGHT ---------- */
+
+.robot-glow{
+    position:absolute;
+    width:350px;
+    height:350px;
+    border-radius:50%;
+    background:
+        radial-gradient(circle,
+            rgba(0,234,255,.32) 0%,
+            rgba(0,120,255,.18) 32%,
+            rgba(139,92,255,.12) 52%,
+            transparent 72%);
+    filter:blur(18px);
+    animation:robotGlow3D 4s ease-in-out infinite;
+    z-index:0;
+}
+
+/* ---------- FUTURISTIC ORBITS ---------- */
+
+.robot-orbit{
+    position:absolute;
+    border:1px solid rgba(0,234,255,.38);
+    border-radius:50%;
+    transform-style:preserve-3d;
+    box-shadow:
+        0 0 12px rgba(0,234,255,.22),
+        inset 0 0 12px rgba(0,234,255,.08);
+    z-index:1;
+}
+
+.robot-orbit.orbit1{
+    width:410px;
+    height:150px;
+    transform:rotateX(70deg);
+    animation:orbit1Premium 9s linear infinite;
+}
+
+.robot-orbit.orbit2{
+    width:340px;
+    height:340px;
+    border-color:rgba(0,180,255,.18);
+    animation:orbit2Premium 13s linear infinite;
+}
+
+.robot-orbit.orbit3{
+    width:430px;
+    height:170px;
+    transform:rotateY(70deg);
+    border-color:rgba(139,92,255,.42);
+    animation:orbit3Premium 8s linear infinite;
+}
+
+/* ---------- MAIN ROBOT ---------- */
+
+.robot-3d{
+    position:relative;
+    width:235px;
+    height:380px;
+    transform-style:preserve-3d;
+    animation:robotFloat3D 5s ease-in-out infinite;
+    filter:
+        drop-shadow(0 18px 22px rgba(0,0,0,.55))
+        drop-shadow(0 0 22px rgba(0,234,255,.30));
+    z-index:5;
+}
+
+/* ---------- ANTENNA ---------- */
+
+.robot-antenna{
+    position:absolute;
+    left:111px;
+    top:0;
+    width:13px;
+    height:46px;
+    border-radius:10px;
+    background:
+        linear-gradient(
+            90deg,
+            #07152a 0%,
+            #168cff 28%,
+            #5d42ff 55%,
+            #00eaff 100%
+        );
+    box-shadow:
+        0 0 10px #168cff,
+        0 0 25px rgba(0,234,255,.65);
+    transform:translateZ(22px);
+}
+
+.robot-antenna:after{
+    content:"";
+    position:absolute;
+    left:2px;
+    top:8px;
+    width:9px;
+    height:28px;
+    border-radius:8px;
+    background:linear-gradient(#00eaff,#8b5cff);
+    opacity:.8;
+}
+
+.robot-antenna i{
+    position:absolute;
+    left:0;
+    top:-9px;
+    width:13px;
+    height:13px;
+    border-radius:50%;
+    background:#00f6a6;
+    box-shadow:
+        0 0 8px #00f6a6,
+        0 0 22px #00f6a6,
+        0 0 38px rgba(0,246,166,.7);
+    animation:antennaPulse 1.5s ease-in-out infinite;
+    z-index:4;
+}
+
+/* ---------- HEAD ---------- */
+
+.robot-head{
+    position:absolute;
+    left:34px;
+    top:42px;
+    width:167px;
+    height:128px;
+    border-radius:42px 42px 50px 50px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #3c6076 0%,
+            #16344c 17%,
+            #071625 48%,
+            #050d19 70%,
+            #19114b 100%
+        );
+
+    border:2px solid #13dfff;
+
+    box-shadow:
+        inset 8px 8px 18px rgba(255,255,255,.08),
+        inset -10px -12px 25px rgba(0,0,0,.65),
+        inset 0 0 35px rgba(0,234,255,.18),
+        0 0 16px rgba(0,234,255,.55),
+        0 0 42px rgba(0,120,255,.28);
+
+    transform:
+        translateZ(38px)
+        rotateX(-2deg);
+
+    overflow:visible;
+}
+
+/* glossy head reflection */
+
+.robot-head:before{
+    content:"";
+    position:absolute;
+    left:18px;
+    top:10px;
+    width:90px;
+    height:22px;
+    border-radius:50%;
+    background:linear-gradient(
+        90deg,
+        rgba(255,255,255,.18),
+        transparent
+    );
+    filter:blur(5px);
+    transform:rotate(-8deg);
+}
+
+/* head lower shadow */
+
+.robot-head:after{
+    content:"";
+    position:absolute;
+    left:24px;
+    right:24px;
+    bottom:-5px;
+    height:18px;
+    border-radius:50%;
+    background:rgba(0,0,0,.45);
+    filter:blur(8px);
+    z-index:-1;
+}
+
+/* ---------- FACE SCREEN ---------- */
+
+.robot-face{
+    position:absolute;
+    left:13px;
+    right:13px;
+    top:16px;
+    bottom:16px;
+    border-radius:32px;
+
+    background:
+        radial-gradient(
+            circle at 50% 20%,
+            rgba(0,234,255,.12),
+            transparent 45%
+        ),
+        linear-gradient(
+            145deg,
+            #061c2d,
+            #06121e 58%,
+            #0b1830
+        );
+
+    border:1px solid rgba(0,234,255,.35);
+
+    box-shadow:
+        inset 0 0 30px rgba(0,234,255,.14),
+        inset 0 -12px 20px rgba(0,0,0,.38);
+}
+
+/* ---------- DIGITAL EYES ---------- */
+
+.eye{
+    position:absolute;
+    top:38px;
+    width:29px;
+    height:17px;
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            ellipse,
+            #ffffff 0%,
+            #00f6ff 32%,
+            #00aaff 62%,
+            transparent 100%
+        );
+
+    box-shadow:
+        0 0 8px #00eaff,
+        0 0 18px #00eaff,
+        0 0 32px rgba(0,234,255,.65);
+
+    animation:
+        eyeGlow 2.6s ease-in-out infinite,
+        eyeBlink 6s ease-in-out infinite;
+}
+
+.eye.left{
+    left:30px;
+}
+
+.eye.right{
+    right:30px;
+}
+
+/* ---------- DIGITAL MOUTH ---------- */
+
+.robot-mouth{
+    position:absolute;
+    left:50%;
+    bottom:25px;
+    width:47px;
+    height:6px;
+    transform:translateX(-50%);
+    border-radius:20px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #643bff,
+            #b76cff,
+            #643bff
+        );
+
+    box-shadow:
+        0 0 8px #8b5cff,
+        0 0 18px rgba(139,92,255,.8);
+
+    animation:mouthPulse 2.5s ease-in-out infinite;
+}
+
+/* ---------- EARS ---------- */
+
+.ear{
+    position:absolute;
+    top:44px;
+    width:22px;
+    height:52px;
+    border-radius:10px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #193e5c,
+            #071421
+        );
+
+    border:2px solid #168cff;
+
+    box-shadow:
+        inset 0 0 10px rgba(0,234,255,.2),
+        0 0 12px rgba(0,180,255,.45);
+
+    z-index:-1;
+}
+
+.ear.left{
+    left:-18px;
+}
+
+.ear.right{
+    right:-18px;
+}
+
+.ear:after{
+    content:"";
+    position:absolute;
+    left:5px;
+    right:5px;
+    top:13px;
+    height:22px;
+    border-radius:6px;
+    background:#00eaff;
+    opacity:.18;
+    box-shadow:0 0 12px #00eaff;
+}
+
+/* ---------- NECK ---------- */
+
+.robot-neck{
+    position:absolute;
+    left:96px;
+    top:163px;
+    width:43px;
+    height:32px;
+
+    border-radius:8px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #050b13,
+            #1c5b77 30%,
+            #00dfff 50%,
+            #17486a 70%,
+            #050b13
+        );
+
+    border:1px solid rgba(0,234,255,.35);
+
+    box-shadow:
+        inset 0 0 12px rgba(0,234,255,.35),
+        0 0 15px rgba(0,234,255,.25);
+
+    transform:translateZ(25px);
+}
+
+/* ---------- TORSO ---------- */
+
+.robot-torso{
+    position:absolute;
+    left:39px;
+    top:183px;
+    width:157px;
+    height:137px;
+
+    border-radius:31px 31px 42px 42px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #3a596c 0%,
+            #17364d 13%,
+            #071521 42%,
+            #050c17 67%,
+            #1d1250 100%
+        );
+
+    border:2px solid #168cff;
+
+    box-shadow:
+        inset 10px 8px 20px rgba(255,255,255,.07),
+        inset -12px -15px 25px rgba(0,0,0,.6),
+        inset 0 0 35px rgba(0,234,255,.15),
+        0 0 20px rgba(0,140,255,.35),
+        0 18px 30px rgba(0,0,0,.35);
+
+    transform:
+        translateZ(25px)
+        rotateX(-2deg);
+}
+
+/* torso glass highlight */
+
+.robot-torso:before{
+    content:"";
+    position:absolute;
+    left:17px;
+    top:8px;
+    width:80px;
+    height:18px;
+    border-radius:50%;
+    background:rgba(255,255,255,.08);
+    filter:blur(5px);
+}
+
+/* ---------- CHEST CORE ---------- */
+
+.robot-chest{
+    position:absolute;
+    left:50%;
+    top:25px;
+    width:52px;
+    height:52px;
+    transform:translateX(-50%);
+
+    border-radius:15px;
+
+    border:2px solid #00eaff;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    color:#fff;
+    font-weight:1000;
+    font-size:20px;
+    letter-spacing:-2px;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(0,234,255,.22),
+            rgba(5,14,28,.95)
+        );
+
+    box-shadow:
+        inset 0 0 18px rgba(0,234,255,.25),
+        0 0 12px #00eaff,
+        0 0 30px rgba(0,234,255,.5);
+
+    animation:chestCore 2.8s ease-in-out infinite;
+}
+
+.robot-chest:before{
+    content:"";
+    position:absolute;
+    inset:7px;
+    border-radius:9px;
+    border:1px solid rgba(0,246,166,.35);
+}
+
+.robot-chest span{
+    color:#8b5cff;
+    text-shadow:0 0 12px #8b5cff;
+}
+
+/* ---------- CHEST LIGHT LINES ---------- */
+
+.robot-line{
+    position:absolute;
+    left:27px;
+    width:100px;
+    height:2px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            #00eaff,
+            transparent
+        );
+
+    box-shadow:0 0 8px #00eaff;
+}
+
+.robot-line.l1{
+    bottom:27px;
+}
+
+.robot-line.l2{
+    bottom:17px;
+    opacity:.45;
+}
+
+/* ---------- SHOULDERS ---------- */
+
+.robot-shoulder{
+    position:absolute;
+    top:188px;
+    width:49px;
+    height:55px;
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle at 35% 30%,
+            #497085,
+            #102e45 45%,
+            #050e19 75%
+        );
+
+    border:2px solid #168cff;
+
+    box-shadow:
+        inset 0 0 16px rgba(0,234,255,.2),
+        0 0 15px rgba(0,180,255,.3);
+}
+
+.robot-shoulder.left{
+    left:14px;
+}
+
+.robot-shoulder.right{
+    right:14px;
+}
+
+/* ---------- ARMS ---------- */
+
+.robot-arm{
+    position:absolute;
+    top:205px;
+    width:38px;
+    height:112px;
+
+    border-radius:21px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #41677b,
+            #16384f 28%,
+            #071420 65%,
+            #14103b
+        );
+
+    border:2px solid #168cff;
+
+    box-shadow:
+        inset 5px 4px 10px rgba(255,255,255,.07),
+        inset -6px -8px 14px rgba(0,0,0,.55),
+        0 0 18px rgba(0,180,255,.3);
+
+    transform-origin:top center;
+}
+
+.arm-left{
+    left:15px;
+    transform:
+        rotate(12deg)
+        translateZ(15px);
+}
+
+.arm-right{
+    right:15px;
+    transform:
+        rotate(-12deg)
+        translateZ(15px);
+}
+
+/* arm highlight */
+
+.robot-arm:before{
+    content:"";
+    position:absolute;
+    top:12px;
+    left:7px;
+    width:6px;
+    height:70px;
+    border-radius:10px;
+    background:linear-gradient(
+        #00eaff,
+        transparent
+    );
+    opacity:.25;
+}
+
+/* ---------- ELBOW / JOINT ---------- */
+
+.robot-joint{
+    position:absolute;
+    bottom:22px;
+    left:8px;
+    width:19px;
+    height:19px;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            #b083ff,
+            #8b5cff 40%,
+            #3c1c91 75%
+        );
+
+    border:1px solid #bd9cff;
+
+    box-shadow:
+        0 0 10px #8b5cff,
+        0 0 22px rgba(139,92,255,.8);
+}
+
+/* ---------- ROBOT HAND ---------- */
+
+.robot-hand{
+    position:absolute;
+    bottom:-28px;
+    left:2px;
+    width:30px;
+    height:32px;
+
+    border:2px solid #00eaff;
+    border-radius:12px 12px 14px 14px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #31566d,
+            #081522
+        );
+
+    box-shadow:
+        inset 0 0 10px rgba(0,234,255,.2),
+        0 0 14px rgba(0,234,255,.35);
+}
+
+/* robotic fingers */
+
+.robot-hand:before{
+    content:"";
+    position:absolute;
+    left:5px;
+    top:5px;
+    width:16px;
+    height:3px;
+    border-radius:4px;
+    background:#00eaff;
+    box-shadow:
+        0 6px 0 rgba(0,234,255,.6),
+        0 12px 0 rgba(0,234,255,.35);
+}
+
+/* ---------- WAIST ---------- */
+
+.robot-waist{
+    position:absolute;
+    left:78px;
+    top:312px;
+    width:80px;
+    height:27px;
+
+    border-radius:10px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #07101a,
+            #1d4962,
+            #00cce8,
+            #1d4962,
+            #07101a
+        );
+
+    border:1px solid rgba(0,234,255,.45);
+
+    box-shadow:
+        0 0 16px rgba(0,234,255,.28);
+}
+
+/* ---------- LEGS ---------- */
+
+.robot-leg{
+    position:absolute;
+    top:325px;
+    width:43px;
+    height:55px;
+
+    border-radius:16px 16px 20px 20px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #355c71,
+            #102d42 40%,
+            #050e19
+        );
+
+    border:2px solid #168cff;
+
+    box-shadow:
+        inset 0 0 12px rgba(0,234,255,.14),
+        0 0 12px rgba(0,180,255,.25);
+}
+
+.robot-leg.left{
+    left:66px;
+}
+
+.robot-leg.right{
+    right:66px;
+}
+
+.robot-leg:after{
+    content:"";
+    position:absolute;
+    left:6px;
+    right:6px;
+    bottom:7px;
+    height:6px;
+    border-radius:50%;
+    background:#00eaff;
+    opacity:.35;
+    box-shadow:0 0 10px #00eaff;
+}
+
+/* ---------- HOVER PLATFORM ---------- */
+
+.robot-base{
+    position:absolute;
+    left:66px;
+    bottom:-4px;
+    width:103px;
+    height:38px;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            ellipse,
+            #214b65,
+            #071522 65%
+        );
+
+    border:2px solid #00eaff;
+
+    box-shadow:
+        inset 0 0 18px rgba(0,234,255,.25),
+        0 0 16px rgba(0,234,255,.5),
+        0 0 45px rgba(0,180,255,.25);
+
+    transform:translateZ(10px);
+    animation:platformPulse 2.5s ease-in-out infinite;
+}
+
+/* platform energy ring */
+
+.robot-base:before{
+    content:"";
+    position:absolute;
+    left:-16px;
+    right:-16px;
+    top:9px;
+    height:14px;
+    border:1px solid rgba(0,234,255,.35);
+    border-radius:50%;
+    box-shadow:0 0 18px rgba(0,234,255,.2);
+}
+
+/* ---------- ROBOT LABEL ---------- */
+
+.robot-label{
+    position:absolute;
+    bottom:-20px;
+    left:50%;
+    transform:translateX(-50%);
+    text-align:center;
+    white-space:nowrap;
+
+    color:#fff;
+    text-shadow:
+        0 0 8px rgba(0,234,255,.8),
+        0 0 18px rgba(0,234,255,.3);
+
+    z-index:10;
+}
+
+.robot-label b{
+    display:block;
+    font-size:12px;
+    letter-spacing:2px;
+}
+
+.robot-label small{
+    display:block;
+    color:#00f6a6;
+    font-size:10px;
+    letter-spacing:1.5px;
+    margin-top:5px;
+    text-shadow:0 0 10px #00f6a6;
+}
+
+/* =========================================================
+   PREMIUM ROBOT ANIMATIONS
+========================================================= */
+
+@keyframes robotFloat3D{
+    0%,100%{
+        transform:
+            translateY(0)
+            rotateY(-2deg)
+            rotateX(1deg);
+    }
+
+    50%{
+        transform:
+            translateY(-13px)
+            rotateY(4deg)
+            rotateX(-1deg);
+    }
+}
+
+@keyframes robotGlow3D{
+    0%,100%{
+        transform:scale(.94);
+        opacity:.65;
+    }
+
+    50%{
+        transform:scale(1.13);
+        opacity:1;
+    }
+}
+
+@keyframes orbit1Premium{
+    from{
+        transform:rotateX(70deg) rotateZ(0deg);
+    }
+
+    to{
+        transform:rotateX(70deg) rotateZ(360deg);
+    }
+}
+
+@keyframes orbit2Premium{
+    from{
+        transform:rotateY(0deg);
+    }
+
+    to{
+        transform:rotateY(360deg);
+    }
+}
+
+@keyframes orbit3Premium{
+    from{
+        transform:rotateY(70deg) rotateZ(0deg);
+    }
+
+    to{
+        transform:rotateY(70deg) rotateZ(-360deg);
+    }
+}
+
+@keyframes antennaPulse{
+    0%,100%{
+        transform:scale(.9);
+        opacity:.7;
+    }
+
+    50%{
+        transform:scale(1.25);
+        opacity:1;
+    }
+}
+
+@keyframes eyeGlow{
+    0%,100%{
+        box-shadow:
+            0 0 8px #00eaff,
+            0 0 18px #00eaff,
+            0 0 28px rgba(0,234,255,.5);
+    }
+
+    50%{
+        box-shadow:
+            0 0 12px #ffffff,
+            0 0 25px #00eaff,
+            0 0 42px rgba(0,234,255,.85);
+    }
+}
+
+@keyframes eyeBlink{
+    0%,45%,48%,100%{
+        transform:scaleY(1);
+    }
+
+    46%,47%{
+        transform:scaleY(.08);
+    }
+}
+
+@keyframes mouthPulse{
+    0%,100%{
+        opacity:.7;
+        transform:translateX(-50%) scaleX(.9);
+    }
+
+    50%{
+        opacity:1;
+        transform:translateX(-50%) scaleX(1.12);
+    }
+}
+
+@keyframes chestCore{
+    0%,100%{
+        transform:translateX(-50%) scale(.96);
+    }
+
+    50%{
+        transform:translateX(-50%) scale(1.06);
+        box-shadow:
+            inset 0 0 22px rgba(0,234,255,.35),
+            0 0 18px #00eaff,
+            0 0 42px rgba(0,234,255,.7);
+    }
+}
+
+@keyframes platformPulse{
+    0%,100%{
+        transform:scaleX(.92);
+        opacity:.8;
+    }
+
+    50%{
+        transform:scaleX(1.08);
+        opacity:1;
+    }
+}
+
+/* ---------- RESPONSIVE ---------- */
+
+@media(max-width:1050px){
+
+    .robot-stage{
+        height:410px;
+    }
+
+    .robot-orbit.orbit1{
+        width:340px;
+    }
+
+    .robot-orbit.orbit3{
+        width:360px;
+    }
+
+    .robot-3d{
+        transform:scale(.88);
+    }
+}
+
+@media(max-width:760px){
+
+    .robot-stage{
+        height:390px;
+    }
+
+    .robot-orbit{
+        opacity:.65;
+    }
+
+    .robot-orbit.orbit1{
+        width:300px;
+    }
+
+    .robot-orbit.orbit2{
+        width:280px;
+        height:280px;
+    }
+
+    .robot-orbit.orbit3{
+        width:320px;
+    }
+
+    .robot-3d{
+        transform:scale(.78);
+    }
+} 
+
+
+/* =========================================================
+   FINAL 3D TOP LAYOUT
+   Keeps the existing MobSF UI and moves only the requested
+   title + upload area to the top center.
+========================================================= */
+
+.hero{
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    gap:22px !important;
+    padding:24px 8px 28px !important;
+    perspective:1400px;
+}
+
+.intro{
+    width:100%;
+    text-align:center !important;
+    order:1;
+}
+
+.intro h1{
+    font-size:clamp(38px,5vw,70px) !important;
+    line-height:.95 !important;
+    margin:8px 0 10px !important;
+    letter-spacing:2px !important;
+    text-transform:uppercase;
+    transform:translateZ(30px);
+    text-shadow:0 8px 0 rgba(0,40,80,.55),0 0 28px rgba(0,234,255,.45) !important;
+}
+
+.intro h1 span{display:inline !important}
+.intro h1 em{display:inline !important}
+.intro p{
+    max-width:none !important;
+    margin:0 auto !important;
+    font-size:13px !important;
+    letter-spacing:2.5px !important;
+}
+
+.hero-status{
+    display:inline-block;
+    padding:9px 18px;
+    border:1px solid rgba(0,234,255,.38);
+    border-radius:999px;
+    color:#8defff;
+    background:rgba(0,234,255,.07);
+    box-shadow:0 0 25px rgba(0,234,255,.12), inset 0 0 20px rgba(0,234,255,.06);
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:1.7px;
+    animation:status3D 2.5s ease-in-out infinite;
+}
+
+@keyframes status3D{
+    0%,100%{transform:translateY(0) rotateX(0deg);box-shadow:0 0 20px rgba(0,234,255,.10)}
+    50%{transform:translateY(-3px) rotateX(5deg);box-shadow:0 0 35px rgba(0,234,255,.25)}
+}
+
+.top-upload{
+    order:2;
+    width:min(920px,100%);
+    padding:28px 32px 30px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+    transform-style:preserve-3d;
+    box-shadow:0 25px 70px rgba(0,0,0,.48),0 0 45px rgba(0,180,255,.12),inset 0 0 40px rgba(0,180,255,.055);
+    animation:uploadFloat3D 4.5s ease-in-out infinite;
+}
+
+.top-upload:before{
+    content:"";
+    position:absolute;
+    inset:-2px;
+    border-radius:20px;
+    padding:2px;
+    background:linear-gradient(120deg,transparent 10%,rgba(0,234,255,.55),transparent 45%,rgba(139,92,255,.55),transparent 80%);
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;
+    mask-composite:exclude;
+    pointer-events:none;
+    animation:borderFlow 5s linear infinite;
+}
+
+@keyframes borderFlow{to{transform:rotate(360deg)}}
+
+@keyframes uploadFloat3D{
+    0%,100%{transform:translateY(0) rotateX(0deg)}
+    50%{transform:translateY(-5px) rotateX(1.5deg)}
+}
+
+.top-upload-title{
+    position:relative;
+    z-index:2;
+    font-size:24px;
+    font-weight:1000;
+    letter-spacing:2px;
+    color:#fff;
+    text-shadow:0 3px 0 #07182b,0 0 22px rgba(0,234,255,.6);
+}
+
+.top-upload-title i{
+    color:#00eaff;
+    margin-right:10px;
+    animation:icon3D 2s ease-in-out infinite;
+}
+
+@keyframes icon3D{
+    0%,100%{transform:translateZ(0) rotateY(0)}
+    50%{transform:translateZ(25px) rotateY(180deg)}
+}
+
+.top-upload-types{
+    position:relative;
+    z-index:2;
+    margin-top:12px;
+    font-size:16px;
+    font-weight:900;
+    letter-spacing:2px;
+    color:#aeefff;
+    text-shadow:0 0 14px rgba(0,234,255,.45);
+}
+
+.top-upload-hint{
+    position:relative;
+    z-index:2;
+    margin:9px 0 18px;
+    color:#7896aa;
+    font-size:11px;
+    letter-spacing:1.5px;
+}
+
+.top-fileUpload{
+    min-height:72px !important;
+    width:100%;
+    font-size:21px !important;
+    font-weight:1000 !important;
+    letter-spacing:2px !important;
+    border-radius:16px !important;
+    border:1px solid rgba(255,255,255,.22);
+    box-shadow:0 9px 0 rgba(0,70,120,.55),0 18px 35px rgba(0,210,255,.28),inset 0 2px 0 rgba(255,255,255,.35) !important;
+    transform:translateY(0) translateZ(35px);
+    transition:transform .18s ease,box-shadow .18s ease,filter .18s ease;
+}
+
+.top-fileUpload:hover{
+    transform:translateY(-4px) translateZ(45px) scale(1.015) !important;
+    box-shadow:0 12px 0 rgba(0,70,120,.55),0 25px 50px rgba(0,210,255,.5),inset 0 2px 0 rgba(255,255,255,.45) !important;
+    filter:brightness(1.08);
+}
+
+.top-fileUpload:active{
+    transform:translateY(5px) translateZ(20px) !important;
+    box-shadow:0 3px 0 rgba(0,70,120,.55),0 10px 25px rgba(0,210,255,.25) !important;
+}
+
+.top-fileUpload i{font-size:25px !important}
+.top-fileUpload span{position:relative;z-index:2}
+
+.top-upload .status{
+    font-size:12px;
+    font-weight:800;
+    letter-spacing:1px;
+}
+
+.hero .scanner{
+    order:3;
+    width:100%;
+    min-height:500px !important;
+    display:flex !important;
+    align-items:center;
+    justify-content:center;
+}
+
+.hero .robot-stage{
+    width:100%;
+}
+
+.top-score{
+    order:4;
+    width:min(520px,100%);
+}
+
+.quick button,
+.action,
+.nav button,
+.nav a{
+    transform-style:preserve-3d;
+    box-shadow:0 5px 0 rgba(0,55,100,.42),inset 0 0 18px rgba(0,180,255,.04);
+}
+
+.quick button:active,
+.action:active,
+.nav button:active,
+.nav a:active{
+    transform:translateY(4px) translateZ(5px) !important;
+    box-shadow:0 1px 0 rgba(0,55,100,.42),inset 0 0 18px rgba(0,180,255,.06);
+}
+
+@media(max-width:760px){
+    .top-upload{padding:22px 16px 24px}
+    .top-upload-title{font-size:19px}
+    .top-upload-types{font-size:12px;line-height:1.7}
+    .top-fileUpload{font-size:16px !important;min-height:62px !important}
+    .hero .scanner{min-height:420px !important}
+}
+
+</style>
 </head>
-
-
 <body>
-
-
-<!-- =========================================================
-     ANIMATED BACKGROUND
-========================================================= -->
-
-<div class="background">
-
-    <div class="grid"></div>
-
-    <div class="glow one"></div>
-
-    <div class="glow two"></div>
-
-    <div class="particles">
-
-        <div class="particle p1"></div>
-        <div class="particle p2"></div>
-        <div class="particle p3"></div>
-        <div class="particle p4"></div>
-        <div class="particle p5"></div>
-        <div class="particle p6"></div>
-        <div class="particle p7"></div>
-        <div class="particle p8"></div>
-
-    </div>
-
-</div>
-
-
-<div class="page">
-
-
-<!-- =========================================================
-     NAVIGATION
-========================================================= -->
-
-<nav class="topbar">
-
-    <a class="nav-link active"
-       href="{% url 'recent' %}">
-        SCANS
-    </a>
-
-    <a class="nav-link"
-       href="{% url 'dynamic' %}">
-        DYNAMIC ANALYZER
-    </a>
-
-    <img class="logo"
-         src="{% static 'img/mobsf_logo.png' %}"
-         alt="MobSF">
-
-    <a class="nav-link"
-       href="{% url 'api_docs' %}">
-        API
-    </a>
-
-    <a class="nav-link"
-       href="{% url 'about' %}">
-        ABOUT
-    </a>
-
-    {% if user.is_authenticated %}
-
-    <a class="nav-link"
-       href="{% url 'logout' %}"
-       title="Logout">
-
-        <i class="fas fa-user-circle"></i>
-
-    </a>
-
-    {% endif %}
-
+<div class="background"><div class="space"></div><div class="grid3d"></div><div class="orb a"></div><div class="orb b"></div><div class="orb c"></div><div class="scanline"></div></div>
+<div class="drop-overlay" id="drop"><div class="drop-box"><i class="fas fa-cloud-upload-alt"></i><h2>DROP APPLICATION</h2><p>Release to start MobSF analysis</p></div></div>
+<div class="shell">
+<aside class="sidebar">
+<div class="brand"><img src="{% static 'img/mobsf_logo.png' %}" alt="MobSF"><div><strong>APPSEC</strong><small>SECURITY ANALYSIS</small></div></div>
+<nav class="nav">
+<button class="active" data-ripple onclick="showModule('Dashboard','dashboard')"><i class="fas fa-home"></i><span>Dashboard</span></button>
+<button data-ripple onclick="showModule('Scan','scan')"><i class="fas fa-search"></i><span>Scan</span></button>
+<button data-ripple onclick="showModule('Applications','recent')"><i class="fas fa-th-large"></i><span>Applications</span></button>
+<button data-ripple onclick="showModule('Reports','recent')"><i class="fas fa-file-alt"></i><span>Reports</span></button>
+<button data-ripple onclick="showModule('Threat Center','recent')"><i class="fas fa-exclamation-triangle"></i><span>Threats</span></button>
+<button data-ripple onclick="showModule('Analytics','recent')"><i class="fas fa-chart-line"></i><span>Analytics</span></button>
+<button data-ripple onclick="showModule('Privacy','recent')"><i class="fas fa-user-shield"></i><span>Privacy</span></button>
+<button data-ripple onclick="showModule('Dynamic Analyzer','dynamic')"><i class="fas fa-bolt"></i><span>Dynamic</span></button>
+<button data-ripple onclick="showModule('API','api')"><i class="fas fa-code"></i><span>API</span></button>
+<button data-ripple onclick="showModule('About','about')"><i class="fas fa-info-circle"></i><span>About</span></button>
+<a href="{% url 'logout' %}"><i class="fas fa-power-off"></i><span>Logout</span></a>
 </nav>
+<div class="engine-card"><div class="engine-title">REAL-TIME PROTECTION</div><div class="online">APPLICATION ENGINE ONLINE</div><div style="color:#637f92;font-size:9px;margin-top:9px">MobSF analysis services ready</div></div>
+</aside>
+<main class="main">
+<header class="top"><div class="status-pill"><b>●</b> MOBSF SECURITY ENGINE ONLINE</div><div class="user"><div class="avatar"><i class="fas fa-robot"></i></div><div><strong>APPLICATION SECURITY</strong><small>SECURITY ANALYSIS • ONLINE</small></div><i class="fas fa-bell" style="color:#91a6b7;margin-left:8px"></i></div></header>
+<section class="hero">
+<div class="intro">
+    <div class="hero-status">● MOBSF SECURITY ENGINE ONLINE</div>
+    <h1>ANDROID APPLICATION <span>SECURITY</span> <em>ANALYSIS</em></h1>
+    <p>ADVANCED MOBILE APPLICATION SECURITY ANALYSIS</p>
+</div>
 
-
-<!-- =========================================================
-     HERO
-========================================================= -->
-
-<main class="hero">
-
-
-    <div class="security-status">
-
-        <span class="status-dot"></span>
-
-        MOBSF SECURITY ENGINE ONLINE
-
-    </div>
-
-
-    <h1 class="title">
-
-        MOBILE <span>SECURITY</span>
-
-    </h1>
-
-
-    <div class="subtitle">
-
-        AUTOMATED APPLICATION SECURITY ANALYSIS
-
-    </div>
-
-
-    <!-- =====================================================
-         3D SCENE
-    ====================================================== -->
-
-    <div class="scene">
-
-        <div class="scan-ring ring1"></div>
-
-        <div class="scan-ring ring2"></div>
-
-
-        <div class="upload-platform">
-
-            <div class="platform-line line-top"></div>
-            <div class="platform-line line-bottom"></div>
-
-
-            <!-- 3D SHIELD -->
-
-            <div class="shield">
-
-                <i class="fas fa-shield-alt"></i>
-
-            </div>
-
-
-            <!-- UPLOAD CONTENT -->
-
-            <div class="upload-content">
-
-
-                <div class="upload-icon">
-
-                    <i class="fas fa-cloud-upload-alt"></i>
-
-                </div>
-
-
-                <div class="upload-title">
-
-                    Upload Application
-
-                </div>
-
-
-                <div class="upload-types">
-
-                    APK &nbsp; / &nbsp; .EXE &nbsp; / &nbsp; iPhone
-
-                </div>
-
-
-                <form id="upload_form"
-                      enctype="multipart/form-data"
-                      method="post">
-
-                    {% csrf_token %}
-
-
-                    <div class="fileUpload"
-                         id="but">
-
-
-                        <input type="file"
-                               name="file"
-                               id="uploadFile"
-                               multiple
-                               accept=".apk,.apks,.xapk,.aab,.jar,.aar,.so,.ipa,.dylib,.a,.zip,.appx,.exe">
-
-
-                        <i class="fas fa-file-shield"></i>
-
-                        SELECT APPLICATION
-
-                    </div>
-
-
-                    <div id="status"></div>
-
-
-                    <progress id="progressBar"
-                              value="0"
-                              max="100"
-                              style="width:280px;visibility:hidden;">
-                    </progress>
-
-
-                </form>
-
-            </div>
-
+<div class="top-upload card">
+    <div class="top-upload-title"><i class="fas fa-shield-alt"></i> UPLOAD APPLICATION</div>
+    <div class="top-upload-types">APK / APKS / XAPK / AAB / IPA / APPX / EXE</div>
+    <div class="top-upload-hint">SELECT AN APPLICATION TO START SECURITY ANALYSIS</div>
+    <form id="upload_form" enctype="multipart/form-data" method="post">
+        <div class="fileUpload top-fileUpload" id="but">
+            <i class="fas fa-file-shield"></i>
+            <span>SELECT FILE</span>
+            <input type="file" name="file" id="uploadFile" multiple accept=".apk,.apks,.xapk,.aab,.jar,.aar,.so,.ipa,.dylib,.a,.zip,.appx,.exe">
         </div>
-
-    </div>
-
-
-    <small style="
-        color:#587783;
-        margin-top:15px;
-        letter-spacing:1px;
-    ">
-
-        <i class="fas fa-mouse-pointer"></i>
-
-        SELECT FILE OR DRAG &amp; DROP ANYWHERE
-
-    </small>
-
-
-</main>
-
-
-<!-- =========================================================
-     FOOTER
-========================================================= -->
-
-<footer>
-
-    <div>
-
-        <a href="{% url 'recent' %}">
-            RECENT SCANS
-        </a>
-
-        &nbsp; | &nbsp;
-
-        <a href="{% url 'dynamic' %}">
-            DYNAMIC ANALYZER
-        </a>
-
-        &nbsp; | &nbsp;
-
-        <a href="{% url 'api_docs' %}">
-            API
-        </a>
-
-        &nbsp; | &nbsp;
-
-        <a href="{% url 'donate' %}">
-            DONATE ♥
-        </a>
-
-        &nbsp; | &nbsp;
-
-        <a target="_blank"
-           href="https://mobsf.github.io/docs/#/">
-            DOCS
-        </a>
-
-        &nbsp; | &nbsp;
-
-        <a href="{% url 'about' %}">
-            ABOUT
-        </a>
-
-    </div>
-
-
-    <div class="copyright">
-
-        &copy; {% now "Y" %}
-        Mobile Security Framework - MobSF
-        {{ version }}
-
-    </div>
-
-
-    <div id="alert"
-         class="alert-bar">
-
-        Analysis started!
-        Please wait to be redirected
-        or check recent scans after sometime.
-
-    </div>
-
-</footer>
-
-
+        <div class="status" id="status"></div>
+        <progress id="progressBar" value="0" max="100" style="width:100%;visibility:hidden"></progress>
+    </form>
 </div>
 
-
-<!-- =========================================================
-     LOADING
-========================================================= -->
-
-<div class="hidden loading">
-
-    <div class="uil-ring-css"
-         style="transform:scale(0.79);">
-
-        <div></div>
-
+<div class="scanner" id="scanner">
+  <div class="robot-stage">
+    <div class="robot-orbit orbit1"></div><div class="robot-orbit orbit2"></div><div class="robot-orbit orbit3"></div>
+    <div class="robot-glow"></div>
+    <div class="robot-3d">
+      <div class="robot-antenna"><i></i></div>
+      <div class="robot-head">
+        <div class="robot-face">
+          <span class="eye left"></span><span class="eye right"></span>
+          <span class="robot-mouth"></span>
+        </div>
+        <div class="ear left"></div><div class="ear right"></div>
+      </div>
+      <div class="robot-neck"></div>
+      <div class="robot-torso">
+        <div class="robot-chest">A<span>S</span></div>
+        <div class="robot-line l1"></div><div class="robot-line l2"></div>
+      </div>
+      <div class="robot-arm arm-left"><div class="robot-joint"></div><div class="robot-hand"></div></div>
+      <div class="robot-arm arm-right"><div class="robot-joint"></div><div class="robot-hand"></div></div>
+      <div class="robot-base"></div>
     </div>
-
+    <div class="robot-label"><b>APPLICATION SECURITY ROBOT</b><small>READY FOR ANALYSIS</small></div>
+  </div>
 </div>
 
-
-<!-- =========================================================
-     JAVASCRIPT
-========================================================= -->
-
+<div class="card score-card top-score">
+    <div class="score-head"><span class="card-title">SECURITY SCORE</span><i class="fas fa-shield-alt" style="color:#00f6a6"></i></div>
+    <div class="score-ring"><span>--</span><small>AWAITING SCAN</small></div>
+    <div class="checks"><div class="check"><i class="fas fa-check-circle"></i> MobSF engine online</div><div class="check"><i class="fas fa-check-circle"></i> Upload pipeline ready</div><div class="check"><i class="fas fa-check-circle"></i> Analysis modules ready</div></div>
+</div>
+</section>
+<section class="overview"><div class="card metric"><i class="fas fa-cube"></i><strong>ONLINE</strong><span>MOBSF ENGINE</span><div class="live">● LIVE</div></div><div class="card metric"><i class="fas fa-mobile-alt"></i><strong>READY</strong><span>APPLICATION SCANNER</span><div class="live">● READY</div></div><div class="card metric"><i class="fas fa-bug"></i><strong>LIVE</strong><span>THREAT ANALYSIS</span><div class="live">● ACTIVE</div></div><div class="card metric"><i class="fas fa-clock"></i><strong>NOW</strong><span>ENGINE STATUS</span><div class="live">● CONNECTED</div></div></section>
+<section class="card recent"><div class="recent-head"><span class="card-title">RECENT ACTIVITY</span><button class="action" onclick="openRecent()">VIEW ALL <i class="fas fa-arrow-right"></i></button></div><div class="activity"><span><i class="fas fa-shield-alt" style="color:#00eaff;margin-right:8px"></i> MobSF analysis workspace</span><span class="safe">READY</span><span>Now</span></div><div class="activity"><span><i class="fas fa-upload" style="color:#00eaff;margin-right:8px"></i> Application upload pipeline</span><span class="safe">ONLINE</span><span>Live</span></div><div class="activity"><span><i class="fas fa-chart-line" style="color:#00eaff;margin-right:8px"></i> Security analysis modules</span><span class="safe">ACTIVE</span><span>Live</span></div></section>
+<section class="quick"><button data-ripple onclick="focusScanner()"><i class="fas fa-search-plus"></i><b>DEEP SCAN</b><small>Full application analysis</small></button><button data-ripple onclick="showModule('Vulnerability Center','recent')"><i class="fas fa-bug"></i><b>VULNERABILITY</b><small>Review findings</small></button><button data-ripple onclick="focusScanner()"><i class="fas fa-fingerprint"></i><b>START SCAN</b><small>Upload & analyze</small></button><button data-ripple onclick="showModule('Permission Check','recent')"><i class="fas fa-lock"></i><b>PERMISSION CHECK</b><small>Review analysis results</small></button><button data-ripple onclick="showModule('Privacy Guard','recent')"><i class="fas fa-user-shield"></i><b>PRIVACY GUARD</b><small>Review privacy findings</small></button></section>
+</main></div>
+<div id="moduleToast"><i class="fas fa-shield-alt"></i><span><b>MobSF</b><small>Opening security module…</small></span></div>
+<div class="hidden loading"><div class="uil-ring-css" style="transform:scale(.79)"><div></div></div></div>
+<div id="alert" class="hidden">Analysis started!</div>
 <script src="{% static 'adminlte/plugins/jquery.min.js' %}"></script>
-
 <script src="{% static 'adminlte/plugins/bootstrap/bootstrap.bundle.min.js' %}"></script>
-
-
 <script>
+
 
 /* =========================================================
    HELPERS
@@ -1262,6 +1411,30 @@ function load_result(url) {
 
 
 /* =========================================================
+   CSRF COOKIE HELPER
+   Uses the browser CSRF cookie when Django provides one.
+========================================================= */
+
+function getCookie(name) {
+    const cookies = document.cookie ? document.cookie.split(";") : [];
+    for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + "=")) {
+            return decodeURIComponent(cookie.substring(name.length + 1));
+        }
+    }
+    return "";
+}
+
+function addCsrfHeader(xhr) {
+    const token = getCookie("csrftoken");
+    if (token) {
+        xhr.setRequestHeader("X-CSRFToken", token);
+    }
+}
+
+
+/* =========================================================
    SCAN STATUS
 ========================================================= */
 
@@ -1277,11 +1450,6 @@ function get_status(checksum) {
     );
 
     xhr.setRequestHeader(
-        "X-CSRFToken",
-        '{{ csrf_token }}'
-    );
-
-    xhr.setRequestHeader(
         "X-Requested-With",
         "XMLHttpRequest"
     );
@@ -1291,6 +1459,7 @@ function get_status(checksum) {
         "application/x-www-form-urlencoded"
     );
 
+    addCsrfHeader(xhr);
 
     xhr.onload = function() {
 
@@ -1618,11 +1787,7 @@ function uploadFile(file) {
         );
 
 
-        xhr.setRequestHeader(
-            "X-CSRFToken",
-            '{{ csrf_token }}'
-        );
-
+        addCsrfHeader(xhr);
 
         xhr.upload.addEventListener(
             "progress",
@@ -1694,133 +1859,32 @@ function handleFiles(files) {
 }
 
 
+
 /* =========================================================
-   DRAG & DROP
+   DRAG & DROP - SAFE OVERLAY
 ========================================================= */
-
-let lastTarget = null;
-
-
+const dropZone = document.getElementById("drop");
+let dragDepth = 0;
 function isFile(evt) {
-
-    const dt =
-        evt.dataTransfer;
-
-
-    for (
-        let i = 0;
-        i < dt.types.length;
-        i++
-    ) {
-
-        if (
-            dt.types[i] ===
-            "Files"
-        ) {
-
-            return true;
-        }
-    }
-
-
+    const dt = evt.dataTransfer;
+    if (!dt || !dt.types) return false;
+    for (let i = 0; i < dt.types.length; i++) if (dt.types[i] === "Files") return true;
     return false;
 }
-
-
-window.addEventListener(
-    "dragenter",
-    function(e) {
-
-        if (
-            isFile(e)
-        ) {
-
-            lastTarget =
-                e.target;
-
-
-            document.querySelector(
-                "#drop"
-            ).style.visibility =
-                "";
-
-
-            document.querySelector(
-                "#drop"
-            ).style.opacity =
-                1;
-        }
-    }
-);
-
-
-window.addEventListener(
-    "dragleave",
-    function(e) {
-
-        e.preventDefault();
-
-
-        if (
-            e.target === document ||
-            e.target === lastTarget
-        ) {
-
-            document.querySelector(
-                "#drop"
-            ).style.visibility =
-                "hidden";
-
-
-            document.querySelector(
-                "#drop"
-            ).style.opacity =
-                0;
-        }
-    }
-);
-
-
-window.addEventListener(
-    "dragover",
-    function(e) {
-
-        e.preventDefault();
-    }
-);
-
-
-window.addEventListener(
-    "drop",
-    function(e) {
-
-        e.preventDefault();
-
-
-        document.querySelector(
-            "#drop"
-        ).style.visibility =
-            "hidden";
-
-
-        document.querySelector(
-            "#drop"
-        ).style.opacity =
-            0;
-
-
-        if (
-            e.dataTransfer.files.length > 0
-        ) {
-
-            handleFiles(
-                e.dataTransfer.files
-            );
-        }
-    }
-);
-
-
+window.addEventListener("dragenter", function(e) {
+    if (!isFile(e)) return; e.preventDefault(); dragDepth++;
+    if (dropZone) dropZone.classList.add("show");
+});
+window.addEventListener("dragover", function(e) { if (isFile(e)) e.preventDefault(); });
+window.addEventListener("dragleave", function(e) {
+    if (!isFile(e)) return; e.preventDefault(); dragDepth = Math.max(0, dragDepth - 1);
+    if (dragDepth === 0 && dropZone) dropZone.classList.remove("show");
+});
+window.addEventListener("drop", function(e) {
+    if (!isFile(e)) return; e.preventDefault(); dragDepth = 0;
+    if (dropZone) dropZone.classList.remove("show");
+    if (e.dataTransfer.files && e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
+});
 /* =========================================================
    FILE SELECT
 ========================================================= */
@@ -1925,7 +1989,37 @@ if (
     );
 }
 
-</script>
 
-</body>
-</html>
+function focusScanner() {
+    const scanner = document.getElementById("scanner");
+    if (scanner) scanner.scrollIntoView({behavior:"smooth", block:"center"});
+    const input = document.getElementById("uploadFile");
+    if (input) setTimeout(function(){ input.click(); }, 350);
+}
+function openRecent(){ window.location.href = "{% url 'recent' %}"; }
+function openDynamic(){ window.location.href = "{% url 'dynamic' %}"; }
+function openApi(){ window.location.href = "{% url 'api_docs' %}"; }
+function openAbout(){ window.location.href = "{% url 'about' %}"; }
+function showModule(name,target){
+    const toast=document.getElementById("moduleToast");
+    if(toast){
+        toast.innerHTML='<i class="fas fa-shield-alt"></i><span><b>'+name+'</b><small>Opening MobSF security module…</small></span>';
+        toast.classList.add("show");
+        clearTimeout(window.__toastTimer);
+        window.__toastTimer=setTimeout(function(){toast.classList.remove("show")},1800);
+    }
+    if(target==="dashboard") setTimeout(function(){window.scrollTo({top:0,behavior:"smooth"});},150);
+    else if(target==="recent") setTimeout(openRecent,500);
+    else if(target==="dynamic") setTimeout(openDynamic,500);
+    else if(target==="scan") focusScanner();
+    else if(target==="api") setTimeout(openApi,500);
+    else if(target==="about") setTimeout(openAbout,500);
+}
+document.addEventListener("DOMContentLoaded",function(){
+    document.querySelectorAll("[data-ripple]").forEach(function(btn){
+        btn.addEventListener("click",function(){btn.classList.remove("clicked");void btn.offsetWidth;btn.classList.add("clicked")});
+    });
+});
+
+</script>
+</body></html>
